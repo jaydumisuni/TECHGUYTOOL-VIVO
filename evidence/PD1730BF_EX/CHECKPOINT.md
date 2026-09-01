@@ -74,7 +74,20 @@ Repository: `Iqinix/Qualcomm-firehoses`
 - Staged on ATHENA on 2026-09-02
 - SHA-256: `61D3F76C2CE04467A6672D50C4AE7AA0B528FE71FC5DE09B9BEB7CF0BBA4DF11`
 - Historical servicing packages also contain an exact `V9_YOUTH_PD1730BF.mbn` path
-- This is the highest-priority untested programmer because it is exact-model-specific and structurally distinct from the already-failing local V9 Youth loader
+- This was the highest-priority untested programmer before the 2026-09-02 live test because it is exact-model-specific and structurally distinct from the already-failing local V9 Youth loader
+
+### Candidate 1 live result - 2026-09-02
+
+- COM port: `COM10` / Qualcomm HS-USB QDLoader 9008.
+- Fresh protocol proof: `INITIAL_MODE=sahara` PASS.
+- Repo transport guard: pyserial timeout bounded to `5.0` seconds; focused tests and full suite pass.
+- Candidate SHA-256 reverified: `61D3F76C2CE04467A6672D50C4AE7AA0B528FE71FC5DE09B9BEB7CF0BBA4DF11`.
+- Upload result: `Error: Protocol mismatch between host and target`.
+- Firehose: **NOT REACHED**.
+- GPT/storage/boot read gates: **NOT RUN** because Firehose did not pass.
+- Same-data write proof: **NOT RUN**.
+- Device-content change from this attempt: **NONE**; failure occurred in Sahara before partition access.
+- Candidate 1 classification: **REJECTED BEFORE FIREHOSE**.
 
 ### Candidate 2 — V9 Youth generic ELF
 Repository: `Iqinix/Qualcomm-firehoses`
@@ -127,13 +140,13 @@ The already-tested local V9 Youth loader failed step 4; post-read hash still mat
 When ATHENA/Oracle device control is available:
 1. Detect current COM port and verify `VID_05C6&PID_9008`.
 2. Do **not** use `reset_to_edl` / `ResetToEDL.xml` to create the candidate boundary.
-3. Start Candidate 1 directly from a physically-established 9008 state and require the tool to prove Sahara before upload.
-4. Use TECHGUYTOOL-VIVO `.venv` + `edl-master` to load Candidate 1.
-5. Run `printgpt` / storage-info read proof.
-6. Read `boot` and confirm baseline hash.
-7. Execute the same-data boot write proof only.
-8. Re-read and compare SHA.
-9. If Candidate 1 auth-fails, stop; physically restore fresh 9008 before Candidate 2, then repeat. Do the same before Candidate 3.
+3. Candidate 1 is closed as rejected before Firehose (`Protocol mismatch between host and target`); do not repeat it without new evidence.
+4. Physically establish fresh 9008/Sahara before Candidate 2.
+5. Stage/verify Candidate 2 and run its read-only proof first.
+6. Only if Candidate 2 reaches Firehose: run GPT/storage-info reads.
+7. Read `boot` and confirm the baseline hash.
+8. Execute the same-data boot write proof only after every read gate passes.
+9. Re-read and compare SHA; if Candidate 2 fails, physically restore fresh 9008 before Candidate 3.
 10. Only after a candidate proves safe write authority should actual boot-recovery firmware writes begin.
 
 If all signed candidates still enforce Vivo auth, the exact-HWID `_peek` loader becomes the controlled research path for locating the Firehose auth decision in memory; no blind RAM patching is approved.
@@ -145,9 +158,9 @@ If all signed candidates still enforce Vivo auth, the exact-HWID `_peek` loader 
 - GPT/read access: PROVEN
 - Local V9 Youth loader write authority: BLOCKED BY VIVO AUTH
 - Exact-HWID `_peek` loader: DISCOVERED / UNTESTED
-- Exact PD1730BF public Candidate 1: STAGED / DEVICE PROOF NOT YET CONFIRMED
+- Exact PD1730BF public Candidate 1: TESTED FROM FRESH SAHARA / REJECTED BEFORE FIREHOSE (protocol mismatch)
 - Evidence of partial write from current attempts: NONE
 - `reset_to_edl` as a candidate-transition method: **REJECTED for Device 001**
-- Last confirmed live USB state before Oracle transport failure: Qualcomm HS-USB QDLoader 9008 (COM10)
-- Candidate 1 read-only harness invocation returned an Oracle transport 502; execution status must be recovered on ATHENA before any rerun
+- Last confirmed live USB state after the bounded Candidate 1 run: Qualcomm HS-USB QDLoader 9008 (COM10)
+- Candidate 1 bounded rerun completed: fresh Sahara PASS; loader rejected with `Protocol mismatch between host and target`; Firehose not reached
 - Next destructive action: **none until same-data write proof succeeds**

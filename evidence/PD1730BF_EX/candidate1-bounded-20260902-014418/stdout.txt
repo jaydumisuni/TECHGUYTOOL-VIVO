@@ -1,0 +1,5 @@
+DeviceClass - Warning !
+INITIAL_MODE=sahara
+sahara - Uploading loader D:\projects\TECHGUY TOOL VIVO\loaders\V9_YOUTH_PD1730BF.mbn ...
+sahara
+sahara - [LIB]: [31mError: Protocol mismatch between host and target[0m

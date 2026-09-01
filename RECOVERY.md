@@ -509,6 +509,22 @@ After successful recovery:
 
 ---
 
+## 16A. Candidate 1 bounded Sahara result - 2026-09-02
+
+Candidate 1 `V9_YOUTH_PD1730BF.mbn` was rerun from the physically established Qualcomm 9008 state on COM10 using the repo-owned direct Sahara uploader.
+
+- Pinned SHA-256: `61D3F76C2CE04467A6672D50C4AE7AA0B528FE71FC5DE09B9BEB7CF0BBA4DF11`.
+- The Windows serial transport now uses a bounded `5.0` second pyserial timeout instead of inheriting the legacy `1500` value as seconds.
+- Initial protocol proof: `INITIAL_MODE=sahara` PASS.
+- Programmer upload started.
+- Sahara returned: `Error: Protocol mismatch between host and target`.
+- Direct uploader result: `explicit loader did not reach firehose, got 'error'`.
+- Firehose was **not** reached.
+- Therefore GPT, storage-info, boot reads, and the same-data write proof were **not** executed with Candidate 1.
+- No partition program, erase, reset, or firmware write occurred in this bounded test.
+
+Candidate 1 is now classified as **rejected before Firehose / incompatible at the Sahara transfer handshake** for the observed Device 001 state. Do not repeat it without a controlled reason that changes the hypothesis.
+
 ## 17. Current live boundary
 
 As of this handoff:
@@ -520,11 +536,11 @@ As of this handoff:
 - Protected backups: COMPLETE
 - Stock programmer write: BLOCKED BY VIVO AUTH
 - Existing local V9 Youth programmer write: BLOCKED BY VIVO AUTH
-- Candidate 1 `V9_YOUTH_PD1730BF.mbn`: UNTESTED ON DEVICE
+- Candidate 1 `V9_YOUTH_PD1730BF.mbn`: TESTED FROM FRESH SAHARA / REJECTED BEFORE FIREHOSE (`Protocol mismatch between host and target`)
 - Candidate 2 `V9_YOUTH.elf`: UNTESTED ON DEVICE
 - Candidate 3 exact-HWID `_peek`: UNTESTED ON DEVICE
 - Evidence of partial firmware write from current work: NONE
-- Approved next device action: Candidate 1 read-only proof, followed by same-data write proof only if read gates pass
+- Approved next device action: physically establish fresh 9008/Sahara, then Candidate 2 read-only proof; no write unless all read gates for that candidate pass
 
 **There is no approved actual firmware write yet.**
 

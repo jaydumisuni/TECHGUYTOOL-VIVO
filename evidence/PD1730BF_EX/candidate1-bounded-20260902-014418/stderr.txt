@@ -1,0 +1,14 @@
+python.exe : Traceback (most recent call last):
+At line:1 char:711
++ ... econds 300; & $py $tool --edl-root $edl --loader $loader --port COM10 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+  File "D:\projects\TECHGUY TOOL VIVO\tools\direct_sahara_upload.py", line 75, in <module>
+    raise SystemExit(main())
+  File "D:\projects\TECHGUY TOOL VIVO\tools\direct_sahara_upload.py", line 66, in main
+    result = upload_explicit_loader(client, str(loader), initial)
+  File "D:\projects\TECHGUY TOOL VIVO\tools\direct_sahara_upload.py", line 29, in upload_explicit_loader
+    raise RuntimeError(f"explicit loader did not reach firehose, got {result!r}")
+RuntimeError: explicit loader did not reach firehose, got 'error'
