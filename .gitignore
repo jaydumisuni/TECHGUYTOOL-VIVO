@@ -1,0 +1,14 @@
+# Never publish raw customer/device calibration or NV data
+evidence/**/backup/
+*.bin
+*.qcn
+*.nv
+*.nvram
+
+# Large firmware packages
+firmware/
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
