@@ -3,6 +3,21 @@
 ## Repair objective
 Recover this handset from bootloop using TECHGUYTOOL-VIVO / inspectable open-source Qualcomm tooling. Commercial servicing applications are **not** part of the execution path.
 
+## LIVE CORRECTION — 2026-09-02
+
+This section supersedes any older instruction that treats `reset_to_edl` as a safe generic way to obtain fresh Sahara on this handset.
+
+- Windows can show `Qualcomm HS-USB QDLoader 9008` while an already-uploaded Firehose programmer is still active; **9008 enumeration alone does not prove fresh Sahara**.
+- On 2026-09-02, `edl.py` positively detected the handset as `Mode detected: firehose` on COM10.
+- The command path then sent the previously saved QFIL-style XML `<power value="reset_to_edl" />`.
+- Firehose acknowledged the XML command, but the handset re-enumerated as Vivo USB mass storage `VID_2D95&PID_6008`, **not** Qualcomm `VID_05C6&PID_9008` fresh Sahara.
+- Therefore **do not use `reset_to_edl` / `ResetToEDL.xml` as the transition between programmer candidates on Device 001**.
+- The user physically returned the handset to Qualcomm HS-USB QDLoader 9008 on COM10 immediately afterward. No partition program, erase, or firmware write occurred during the bad transition.
+- Before any candidate programmer test, require both:
+  1. Windows shows `VID_05C6&PID_9008` / Qualcomm HS-USB QDLoader 9008, and
+  2. the first EDL interaction proves Sahara and uploads the intended candidate; do not infer Sahara from Device Manager alone.
+- If a candidate test leaves an active Firehose session, stop at that boundary. Obtain fresh hardware EDL/9008 using the proven physical entry method before testing another programmer; do not send `reset_to_edl` again.
+
 ## Proven identity
 - Brand: Vivo
 - Model: 1727
@@ -33,6 +48,8 @@ Recover this handset from bootloop using TECHGUYTOOL-VIVO / inspectable open-sou
 - Full GPT read succeeded
 - Controlled same-data `boot` write was rejected with `ret_auth=0 / Unauthorized`
 
+> Historical note: the sentence above records the older experiment as originally observed. The 2026-09-02 live correction proves that `reset_to_edl` must **not** be used as the generic transition for future candidate tests.
+
 ## Exact HWID + PK-hash Vivo loader — DISCOVERED, NOT YET DEVICE-TESTED
 `D:\###\techguytool\Qualcomm-Tool-master\assets\devices\loaders\auto\vivo\0009a0e100000000_60ba997fef6da9f0_fhprg_peek.bin`
 
@@ -54,6 +71,8 @@ Repository: `Iqinix/Qualcomm-firehoses`
 
 - Git blob SHA: `6c1ae1dd5894d5f082f4c1c8dcd5c9194104e10f`
 - Size: 387361 bytes
+- Staged on ATHENA on 2026-09-02
+- SHA-256: `61D3F76C2CE04467A6672D50C4AE7AA0B528FE71FC5DE09B9BEB7CF0BBA4DF11`
 - Historical servicing packages also contain an exact `V9_YOUTH_PD1730BF.mbn` path
 - This is the highest-priority untested programmer because it is exact-model-specific and structurally distinct from the already-failing local V9 Youth loader
 
@@ -106,27 +125,29 @@ The already-tested local V9 Youth loader failed step 4; post-read hash still mat
 
 ## Deterministic next live-device sequence
 When ATHENA/Oracle device control is available:
-1. Detect current COM port and mode.
-2. If in Firehose, issue exact `reset_to_edl` and verify fresh Sahara.
-3. Stage and hash `V9_YOUTH_PD1730BF.mbn` from the public GitHub repository.
+1. Detect current COM port and verify `VID_05C6&PID_9008`.
+2. Do **not** use `reset_to_edl` / `ResetToEDL.xml` to create the candidate boundary.
+3. Start Candidate 1 directly from a physically-established 9008 state and require the tool to prove Sahara before upload.
 4. Use TECHGUYTOOL-VIVO `.venv` + `edl-master` to load Candidate 1.
 5. Run `printgpt` / storage-info read proof.
 6. Read `boot` and confirm baseline hash.
 7. Execute the same-data boot write proof only.
 8. Re-read and compare SHA.
-9. If Candidate 1 auth-fails, repeat with Candidate 2, then Candidate 3.
+9. If Candidate 1 auth-fails, stop; physically restore fresh 9008 before Candidate 2, then repeat. Do the same before Candidate 3.
 10. Only after a candidate proves safe write authority should actual boot-recovery firmware writes begin.
 
 If all signed candidates still enforce Vivo auth, the exact-HWID `_peek` loader becomes the controlled research path for locating the Firehose auth decision in memory; no blind RAM patching is approved.
 
 ## Current boundary
 - Device transport: PROVEN
-- Sahara reset-to-EDL: PROVEN
 - Firmware integrity: PROVEN
 - Protected device backups: COMPLETE
 - GPT/read access: PROVEN
 - Local V9 Youth loader write authority: BLOCKED BY VIVO AUTH
 - Exact-HWID `_peek` loader: DISCOVERED / UNTESTED
-- Exact PD1730BF public candidate: DISCOVERED / UNTESTED
+- Exact PD1730BF public Candidate 1: STAGED / DEVICE PROOF NOT YET CONFIRMED
 - Evidence of partial write from current attempts: NONE
+- `reset_to_edl` as a candidate-transition method: **REJECTED for Device 001**
+- Last confirmed live USB state before Oracle transport failure: Qualcomm HS-USB QDLoader 9008 (COM10)
+- Candidate 1 read-only harness invocation returned an Oracle transport 502; execution status must be recovered on ATHENA before any rerun
 - Next destructive action: **none until same-data write proof succeeds**
